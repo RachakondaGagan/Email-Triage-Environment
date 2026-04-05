@@ -1,0 +1,95 @@
+spec_version: 1
+name: email_triage_env
+type: env
+description: >
+  A real-world email support triage environment for training and evaluating AI agents.
+  Agents must classify, prioritise, reply to, or escalate support emails across three
+  tasks of increasing difficulty. Reward signals cover classification accuracy, reply
+  quality, escalation correctness, and spam detection.
+
+runtime:
+  type: docker
+  dockerfile: Dockerfile
+
+app:
+  module: server.app
+  variable: app
+
+port: 7860
+
+tasks:
+  - name: classify_only
+    difficulty: easy
+    description: Classify 5 emails by category and priority.
+    max_steps: 10
+    num_emails: 5
+
+  - name: triage_and_reply
+    difficulty: medium
+    description: Classify and reply to 8 emails; escalate where required.
+    max_steps: 20
+    num_emails: 8
+
+  - name: crisis_response
+    difficulty: hard
+    description: Handle a 12-email critical inbox with security incidents, SLA violations, and compliance requests.
+    max_steps: 30
+    num_emails: 12
+
+observation_space:
+  type: object
+  fields:
+    current_email:
+      type: object
+      description: The email the agent is currently handling
+    inbox_remaining:
+      type: integer
+      description: Number of unprocessed emails remaining
+    step_feedback:
+      type: string
+      description: Human-readable feedback from the last action
+    last_action_valid:
+      type: boolean
+    episode_done:
+      type: boolean
+
+action_space:
+  type: object
+  fields:
+    action_type:
+      type: string
+      enum: [classify, draft_reply, escalate, archive, request_info]
+    email_id:
+      type: string
+    category:
+      type: string
+      enum: [billing, technical, security, general_inquiry, spam, outage, feature_request, compliance]
+      optional: true
+    priority:
+      type: string
+      enum: [critical, high, medium, low]
+      optional: true
+    reply_text:
+      type: string
+      optional: true
+    escalation_reason:
+      type: string
+      optional: true
+    reasoning:
+      type: string
+      optional: true
+
+reward:
+  range: [-0.5, 1.0]
+  description: >
+    Step-level reward combining classification accuracy (0.0–0.7),
+    reply quality (0.0–0.6), escalation correctness (0.0–0.5),
+    and penalties for archiving critical emails (-0.5) or unnecessary actions.
+  final_score_range: [0.0, 1.0]
+
+metadata:
+  authors: ["OpenEnv Hackathon Submission"]
+  domain: customer_support
+  language: en
+  tags: [email, triage, nlp, support, real-world, classification, generation]
+  huggingface_space: true
