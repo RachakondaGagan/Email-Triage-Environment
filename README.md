@@ -1,20 +1,3 @@
----
-title: Email Triage OpenEnv
-emoji: 📧
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
-tags:
-  - openenv
-  - reinforcement-learning
-  - email
-  - nlp
-  - support
-  - real-world
-  - agent
----
-
 # 📧 Email Triage OpenEnv
 
 > **A real-world email support triage environment for training and evaluating AI agents.**
